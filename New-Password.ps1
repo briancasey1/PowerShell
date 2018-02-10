@@ -1,37 +1,58 @@
 function New-Password {
-    <#
-    .SYNOPSIS
-        Generates a new password.
-    .DESCRIPTION
-        The New-Password cmdlet generates a unique, strong password using words sourced from a word list and then returns the generated password to the console.
 
-        The word list is located at: C:\Path\To\Your\Word\List.csv
-    .EXAMPLE
-        New-Password
-        This generates a unique, strong password and returns the result to the console.
-    .EXAMPLE
-        $Password = New-Password
-        This generates a unique, strong password and assigns it to the $Password variable.
-    .EXAMPLE
-        $SecurePassword = ConvertTo-SecureString (New-Password) -AsPlainText -Force
-        This generates a unique, strong password, converts it to a secure string, and assigns it to the $SecurePassword variable.
-    #>
+    [CmdletBinding()]
 
-    $WordListPath = "C:\Path\To\Your\Word\List.csv"
-    
-    if (Test-Path $WordListPath) {
-        $WordList = Import-Csv $WordListPath
-    
-        $pw1 = Get-Random $WordList.Word; $pw1 = $($pw1.Substring(0,1)).ToUpper() + $pw1.Substring(1)
-        $pw2 = Get-Random $WordList.Word; $pw2 = $($pw2.Substring(0,1)).ToUpper() + $pw2.Substring(1)
-        $pw3 = Get-Random $WordList.Word; $pw3 = $($pw3.Substring(0,1)).ToUpper() + $pw3.Substring(1)
-        $pw4 = Get-Random -Minimum 0 -Maximum 999; $pw4 = $pw4.ToString("00#")
-    
-        $Password=$pw1+$pw2+$pw3+$pw4+"!"
+    param (
+        # Number of words to generate in password, with a default of 3.
+        [Parameter()]
+        [string] $WordCount = 3,
+
+        [Parameter()]
+        [string] $NumberCount = 3,
+
+        [Parameter()]
+        [switch] $NoSpecialCharacter
+    )
+
+    process {
+        # Path to the word list the function pulls from.
+        $WordListPath = "C:\Path\To\Your\Word\List.csv"
+
+        # If word list cannot be found, break here.
+        if (!(Test-Path $WordListPath)) {
+            Write-Error "Word list not found."
+            break
+        }
+
+        $WordList = Import-Csv -Path $WordListPath
+
+        # Generates a random word and capitalizes the first letter.
+        function RandomWord {
+            $Word = Get-Random $WordList.Word; $Word = $($Word.Substring(0,1)).ToUpper() + $Word.Substring(1)
+
+            return $Word
+        }
+
+        # We'll set up an array and define a few special characters in it.
+        $Characters = @("!", "#", "?")
+
+        # We'll use our RandomWord function while $x is less than or equal to the word count.
+        $x = 1; while ($x -le $WordCount) {
+            $Password += (RandomWord)
+            $x++
+        }
+
+        # We'll add a random number (from 0-9) while $x is less than or equal to the number count.
+        $x = 1; while ($x -le $NumberCount) {
+            $Password += (Get-Random -Maximum 9 -Minimum 0).ToString()
+            $x++
+        }
+
+        # If the NoSpecialCharacter parameter is not specified, add a random character from the $Characters array.
+        if (!($NoSpecialCharacter)) {
+            $Password += (Get-Random $Characters)
+        }
 
         return $Password
-
-    } else {
-        Write-Error "Cannot find word list CSV! Cannot generate password."
     }
 }
