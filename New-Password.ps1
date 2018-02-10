@@ -3,20 +3,22 @@ function New-Password {
     [CmdletBinding()]
 
     param (
-        # Number of words to generate in password, with a default of 3.
+        # Amount of words to generate in password (default is 3).
         [Parameter()]
         [string] $WordCount = 3,
 
+        # Amount of numbers to generate in password (default is 3).
         [Parameter()]
         [string] $NumberCount = 3,
 
+        # Switch parameter that, when specified, will not append a special character to password.
         [Parameter()]
         [switch] $NoSpecialCharacter
     )
 
     process {
         # Path to the word list the function pulls from.
-        $WordListPath = "C:\Path\To\Your\Word\List.csv"
+        $WordListPath = "C:\Users\Brian Casey\Projects\PowerShell\WordList.csv"
 
         # If word list cannot be found, break here.
         if (!(Test-Path $WordListPath)) {
