@@ -1,0 +1,18 @@
+function ConvertFrom-UnixTime {
+    [CmdletBinding()]
+    param (
+        # Seconds, formatted in unix time
+        [Parameter(ValueFromPipeline=$true,Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [int]$Seconds
+    )
+
+    process {
+        # First we'll define the beginning of Unix time (1/1/1970).
+        $UnixTimeStart = (Get-Date "1/1/1970")
+
+        # Then we'll add $Seconds to $UnixTimeStart and return the result, accounting for the current time zone.
+        $Time = [timezone]::CurrentTimeZone.ToLocalTime(($UnixTimeStart).AddSeconds($Seconds))
+        return $Time
+    }
+}
