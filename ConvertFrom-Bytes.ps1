@@ -1,4 +1,4 @@
-function Get-FileSize {
+function ConvertFrom-Bytes {
     [CmdletBinding()]
     param(
         # Input file size in bytes
