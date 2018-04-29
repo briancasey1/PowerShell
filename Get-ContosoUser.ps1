@@ -1,4 +1,4 @@
-function Get-User {
+function Get-ContosoUser {
     [CmdletBinding()]
     param(
         # UPN we will be searching in the domains; this is mandatory.
